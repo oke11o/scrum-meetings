@@ -1,0 +1,123 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Team;
+use App\Entity\User;
+use App\Form\TeamType;
+use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+
+/**
+ * Class HomepageController
+ * @package App\Controller
+ * @author Sergey Bevzenko <bevzenko.sergey@gmail.com>
+ *
+ * @Route("/team")
+ */
+class TeamController extends AbstractController
+{
+    /**
+     * @Route("/", name="team_index")
+     */
+    public function index()
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        return $this->render(
+            'team/index.html.twig',
+            [
+                'teams' => $user->getOwnTeams(),
+            ]
+        );
+    }
+
+    /**
+     * @Route("/create", name="team_create")
+     */
+    public function create(Request $request, EntityManagerInterface $em)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $team = $this->createTeam($user);
+
+        $form = $this->createForm(TeamType::class, $team);
+
+        if ($this->updateTeam($request, $form, $em)) {
+            $this->addFlash(
+                'notice',
+                'Your changes were saved!'
+            );
+
+            return $this->redirectToRoute('team_index');
+        }
+
+        return $this->render(
+            'team/update.html.twig',
+            [
+                'form' => $form->createView(),
+            ]
+        );
+    }
+
+    /**
+     * @Route("/edit/{id}", name="team_edit")
+     * @Security("is_granted('TEAM_EDIT', team)")
+     */
+    public function edit(Team $team, Request $request, EntityManagerInterface $em)
+    {
+        $form = $this->createForm(TeamType::class, $team);
+
+        if ($this->updateTeam($request, $form, $em)) {
+            $this->addFlash(
+                'notice',
+                'Your changes were saved!'
+            );
+
+            return $this->redirectToRoute('team_index');
+        }
+
+        return $this->render(
+            'team/update.html.twig',
+            [
+                'form' => $form->createView(),
+            ]
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @param FormInterface $form
+     * @param EntityManagerInterface $em
+     * @return bool
+     */
+    private function updateTeam(Request $request, FormInterface $form, EntityManagerInterface $em): bool
+    {
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $team = $form->getData();
+                $em->persist($team);
+                $em->flush();
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $user
+     * @return Team
+     */
+    private function createTeam($user): Team
+    {
+        return (new Team())->setOwner($user)->addUser($user);
+    }
+}

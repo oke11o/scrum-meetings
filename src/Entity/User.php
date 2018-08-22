@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -51,6 +53,22 @@ class User implements UserInterface
      * @Assert\NotBlank(groups={"Registration"})
      */
     private $plainPassword;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Team", mappedBy="users")
+     */
+    private $teams;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Team", mappedBy="owner")
+     */
+    private $ownTeams;
+
+    public function __construct()
+    {
+        $this->teams = new ArrayCollection();
+        $this->ownTeams = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -177,5 +195,72 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection|Team[]
+     */
+    public function getTeams(): Collection
+    {
+        return $this->teams;
+    }
+
+    public function addTeam(Team $team): self
+    {
+        if (!$this->teams->contains($team)) {
+            $this->teams[] = $team;
+            $team->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTeam(Team $team): self
+    {
+        if ($this->teams->contains($team)) {
+            $this->teams->removeElement($team);
+            $team->removeUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Team[]
+     */
+    public function getOwnTeams(): Collection
+    {
+        return $this->ownTeams;
+    }
+
+    public function addOwnTeam(Team $ownTeam): self
+    {
+        if (!$this->ownTeams->contains($ownTeam)) {
+            $this->ownTeams[] = $ownTeam;
+            $ownTeam->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnTeam(Team $ownTeam): self
+    {
+        if ($this->ownTeams->contains($ownTeam)) {
+            $this->ownTeams->removeElement($ownTeam);
+            // set the owning side to null (unless already changed)
+            if ($ownTeam->getOwner() === $this) {
+                $ownTeam->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return (string) $this->getEmail();
     }
 }

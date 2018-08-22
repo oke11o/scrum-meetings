@@ -1,0 +1,17 @@
+
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
+    <h5 class="my-0 mr-md-auto font-weight-normal">
+        <a href="{{ path('homepage') }}">{{ 'Scrum meetings'|trans }}</a>
+    </h5>
+
+    {% if is_granted('ROLE_USER') %}
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="{{ path('team_index') }}">{{ 'Teams'|trans }}</a>
+        </nav>
+    {% endif %}
+    {% if is_granted('ROLE_USER') %}
+        <a class="btn btn-outline-default" href="{{ path('logout') }}">{{ 'Logout'|trans }}</a>
+    {% else %}
+        <a class="btn btn-outline-primary" href="{{ path('login') }}">{{ 'Login'|trans }}</a>
+    {% endif %}
+</div>

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head lang="{{ app.request.locale }}">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
@@ -23,16 +23,7 @@
         {% block body %}
 
             {% block header %}
-                <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
-                    <h5 class="my-0 mr-md-auto font-weight-normal">
-                        <a href="{{ path('homepage') }}">Company name</a>
-                    </h5>
-                    {% if is_granted('ROLE_USER') %}
-                        <a class="btn btn-outline-default" href="{{ path('logout') }}">Logout</a>
-                    {% else %}
-                        <a class="btn btn-outline-primary" href="{{ path('login') }}">Login</a>
-                    {% endif %}
-                </div>
+                {% include '_base/header.html.twig' %}
             {% endblock %}
 
             {% block content %}{% endblock %}
