@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block styles %}
+    {{ parent() }}
+
+    <link href="{{ asset('css/signin.css') }}" rel="stylesheet"/>
+{% endblock %}
+
+{% block title %}Register!{% endblock %}
+
+{% block body_class %}text-center{% endblock %}
+
+{% block body %}
+    {{ form_start(form, {attr:{class:'form-register'}}) }}
+    <a href="{{ path('homepage') }}">
+        <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" alt="" width="72"
+             height="72">
+    </a>
+
+    <h1 class="h3 mb-3 font-weight-normal">Please register</h1>
+
+    <label for="{{ form.email.vars.id }}" class="sr-only">Email address</label>
+    {{ form_widget(form.email, {attr:{class:'form-control', placeholder:'Email address', autofocus:true}}) }}
+
+    <label for="{{ form.plainPassword.first.vars.id }}" class="sr-only">Password</label>
+    {{ form_widget(form.plainPassword.first, {attr:{class:'form-control password-first', placeholder:'Password'}}) }}
+
+    <label for="{{ form.plainPassword.second.vars.id }}" class="sr-only">Repeat password</label>
+    {{ form_widget(form.plainPassword.second, {attr:{class:'form-control password-second', placeholder:'Repeat password'}}) }}
+
+    <div class="checkbox mb-3">
+        <label>
+            <input type="checkbox" value="remember-me"> Remember me
+        </label>
+    </div>
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+
+    <div class="subbutton-line">
+        <a href="{{ path('login') }}">Login</a>
+    </div>
+    <p class="mt-5 mb-3 text-muted">&copy; 2017-2018</p>
+    {{ form_end(form) }}
+{% endblock %}
