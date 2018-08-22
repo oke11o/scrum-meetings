@@ -94,6 +94,38 @@ class User implements UserInterface
     }
 
     /**
+     * @param string $role
+     * @return $this
+     */
+    public function addRole(string $role): self
+    {
+        if (!in_array($role, $this->roles)) {
+            $this->roles[] = $role;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $role
+     * @return $this
+     */
+    public function removeRole(string $role): self
+    {
+        if (in_array($role, $this->roles)) {
+            $roles = [];
+            foreach ($this->roles as $r) {
+                if ($r !== $role) {
+                    $roles[] = $r;
+                }
+            }
+            $this->roles = $roles;
+        }
+
+        return $this;
+    }
+
+    /**
      * @return string|null
      */
     public function getPlainPassword(): ?string
