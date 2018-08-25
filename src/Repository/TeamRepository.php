@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Team;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -19,22 +20,29 @@ class TeamRepository extends ServiceEntityRepository
         parent::__construct($registry, Team::class);
     }
 
-//    /**
-//     * @return Team[] Returns an array of Team objects
-//     */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param User $user
+     *
+     * @param bool $withoutMyTeams
+     * @return Team[]
+     */
+    public function findUserTeams(User $user, bool $withoutMyTeams = false)
     {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
+        $qb = $this->createQueryBuilder('t')
+            ->leftJoin('t.users', 'u', \Doctrine\ORM\Query\Expr\Join::WITH)
+            ->andWhere('u.id = :id')
+            ->setParameter('id', $user->getId())
             ->orderBy('t.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+            ->setMaxResults(10);
+
+        if ($withoutMyTeams) {
+            $qb
+                ->andWhere('t.owner <> :user')
+                ->setParameter('user', $user);
+        }
+
+        return $qb->getQuery()->getResult();
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Team

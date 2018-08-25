@@ -20,13 +20,44 @@
         <h1 class="display-4">{{ 'Meetings'|trans }}!</h1>
     </div>
     <div class="container">
-        <h2>{{ 'Teams'|trans }}</h2>
-        {% if teams %}
-
-            {% for key, team in teams %}
+        <h2>{{ 'My teams'|trans }}</h2>
+        {% if myTeams|length %}
+            {% for key, team in myTeams %}
                 <h3>
                     {{ team.name }}
                     <a href="{{ path('meeting_create', {id: team.id}) }}" class="btn btn-success">{{ 'Create meeting'|trans }}</a>
+                </h3>
+                {% if team.meetings %}
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">{{ 'Name'|trans }}</th>
+                            <th scope="col">{{ 'Count'|trans }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for key, meeting in team.meetings %}
+                            <tr>
+                                <th scope="row">{{ key+1 }}</th>
+                                <td><a href="{{ path('meeting_show', {id: meeting.id}) }}">{{ meeting.createdAt|date }}</a></td>
+                                <td>{{ meeting.attendees|length }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div>Empty</div>
+        {% endif %}
+
+        <h2>{{ 'Other teams'|trans }}</h2>
+        {% if otherTeams|length %}
+            {% for key, team in otherTeams %}
+                <h3>
+                    {{ team.name }}
                 </h3>
                 {% if team.meetings %}
                     <table class="table table-striped">

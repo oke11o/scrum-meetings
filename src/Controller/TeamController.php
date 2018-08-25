@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Team;
 use App\Entity\User;
 use App\Form\TeamType;
+use App\Repository\TeamRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,15 +26,17 @@ class TeamController extends AbstractController
      * @Route("/", name="team_index")
      * @Security("has_role('ROLE_USER')")
      */
-    public function index()
+    public function index(TeamRepository $teamRepository)
     {
         /** @var User $user */
         $user = $this->getUser();
+        $containsTeams = $teamRepository->findUserTeams($user, true);
 
         return $this->render(
             'team/index.html.twig',
             [
-                'teams' => $user->getOwnTeams(),
+                'myTeams' => $user->getOwnTeams(),
+                'otherTeams' => $containsTeams,
             ]
         );
     }

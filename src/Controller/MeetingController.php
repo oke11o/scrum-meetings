@@ -10,6 +10,7 @@ use App\Event\MeetingEvent;
 use App\Event\MeetingEvents;
 use App\Form\MeetingChooseUserType;
 use App\Provider\DateProvider;
+use App\Repository\TeamRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,18 +33,19 @@ class MeetingController extends AbstractController
      * @Route("/", name="meeting_index")
      * @Security("has_role('ROLE_USER')")
      */
-    public function index()
+    public function index(TeamRepository $teamRepository)
     {
         /** @var User $user */
         $user = $this->getUser();
 
         $teams = $user->getOwnTeams();
+        $containsTeams = $teamRepository->findUserTeams($user, true);
 
         return $this->render(
             'meeting/index.html.twig',
             [
-                'teams' => $teams,
-                'meetings' => [],
+                'myTeams' => $teams,
+                'otherTeams' => $containsTeams,
             ]
         );
     }
