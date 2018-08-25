@@ -34,13 +34,15 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">{{ 'Name'|trans }}</th>
+                            <th scope="col">{{ 'Count'|trans }}</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for key, meeting in team.meetings %}
                             <tr>
                                 <th scope="row">{{ key+1 }}</th>
-                                <td>{{ meeting.createdAt|date }}</td>
+                                <td><a href="{{ path('meeting_show', {id: meeting.id}) }}">{{ meeting.createdAt|date }}</a></td>
+                                <td>{{ meeting.attendees|length }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>

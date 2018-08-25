@@ -23,6 +23,7 @@ class TeamController extends AbstractController
 {
     /**
      * @Route("/", name="team_index")
+     * @Security("has_role('ROLE_USER')")
      */
     public function index()
     {
@@ -39,6 +40,7 @@ class TeamController extends AbstractController
 
     /**
      * @Route("/create", name="team_create")
+     * @Security("has_role('ROLE_USER')")
      */
     public function create(Request $request, EntityManagerInterface $em)
     {
@@ -67,7 +69,7 @@ class TeamController extends AbstractController
 
     /**
      * @Route("/edit/{id}", name="team_edit")
-     * @Security("is_granted('TEAM_EDIT', team)")
+     * @Security("is_granted('TEAM_EDIT', team) and has_role('ROLE_USER')" )
      */
     public function edit(Team $team, Request $request, EntityManagerInterface $em)
     {

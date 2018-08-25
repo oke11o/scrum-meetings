@@ -25,7 +25,7 @@
             <tbody>
             {% for attendee in meeting.attendees %}
                 <tr>
-                    <th scope="row">{{ attendee.user.email }}</th>
+                    <th scope="row"><a href="{{ path('meeting_attendee_edit', {hash: attendee.hash}) }}">{{ attendee.user.email }}</a></th>
                     <td>{{ attendee.whatYesterday }}</td>
                     <td>{{ attendee.whatToday }}</td>
                     <td>{{ attendee.whatProblem }}</td>

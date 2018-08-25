@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block styles %}
+    {{ parent() }}
+
+    <link href="{{ asset('css/homepage.css') }}" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4">{{ 'Meeting'|trans }}!</h1>
+    </div>
+    <div class="container">
+        {% for message in app.flashes('notice') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button type="submit" class="btn btn-success">{{ 'Save'|trans }}</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

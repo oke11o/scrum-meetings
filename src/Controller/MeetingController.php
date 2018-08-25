@@ -11,6 +11,7 @@ use App\Event\MeetingEvents;
 use App\Form\MeetingChooseUserType;
 use App\Provider\DateProvider;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,7 @@ class MeetingController extends AbstractController
 {
     /**
      * @Route("/", name="meeting_index")
+     * @Security("has_role('ROLE_USER')")
      */
     public function index()
     {
@@ -48,6 +50,7 @@ class MeetingController extends AbstractController
 
     /**
      * @Route("/create/{id}", name="meeting_create")
+     * @Security("has_role('ROLE_USER')")
      */
     public function create(Request $request, Team $team, EntityManagerInterface $em, DateProvider $dateProvider, EventDispatcherInterface $dispatcher)
     {
@@ -92,6 +95,7 @@ class MeetingController extends AbstractController
 
     /**
      * @Route("/show/{id}", name="meeting_show")
+     * @Security("has_role('ROLE_USER')")
      */
     public function show(Request $request, Meeting $meeting)
     {
