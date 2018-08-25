@@ -10,21 +10,21 @@
 
     <div class="container">
     {% for message in app.flashes('notice') %}
-        <div class="alert alert-notice">
+        <div class="alert alert-success">
             {{ message }}
         </div>
     {% endfor %}
     </div>
 
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-        <h1 class="display-4">Team!</h1>
+        <h1 class="display-4">{{ 'My teams'|trans }}!</h1>
     </div>
     <div class="container">
         <div class="row">
             <a href="{{ path('team_create') }}" class="btn btn-success">{{ 'Create'|trans }}</a>
         </div>
         <h2>{{ 'My teams'|trans }}</h2>
-        {% if teams%}
+        {% if teams %}
 
             <table class="table table-striped">
                 <thead>

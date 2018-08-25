@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block styles %}
+    {{ parent() }}
+
+    <link href="{{ asset('css/homepage.css') }}" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+    {% for message in app.flashes('notice') %}
+        <div class="alert alert-notice">
+            {{ message }}
+        </div>
+    {% endfor %}
+    </div>
+
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4">{{ 'Meetings'|trans }}!</h1>
+    </div>
+    <div class="container">
+        <h2>{{ 'Teams'|trans }}</h2>
+        {% if teams %}
+
+            {% for key, team in teams %}
+                <h3>
+                    {{ team.name }}
+                    <a href="{{ path('meeting_create', {id: team.id}) }}" class="btn btn-success">{{ 'Create meeting'|trans }}</a>
+                </h3>
+                {% if team.meetings %}
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">{{ 'Name'|trans }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for key, meeting in team.meetings %}
+                            <tr>
+                                <th scope="row">{{ key+1 }}</th>
+                                <td>{{ meeting.createdAt|date }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div>Empty</div>
+        {% endif %}
+    </div>
+{% endblock %}

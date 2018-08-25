@@ -6,11 +6,12 @@
 
     {% if is_granted('ROLE_USER') %}
         <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="{{ path('meeting_index') }}">{{ 'Meetings'|trans }}</a>
             <a class="p-2 text-dark" href="{{ path('team_index') }}">{{ 'Teams'|trans }}</a>
         </nav>
     {% endif %}
     {% if is_granted('ROLE_USER') %}
-        <a class="btn btn-outline-default" href="{{ path('logout') }}">{{ 'Logout'|trans }}</a>
+        <a class="btn btn-outline-default" href="{{ path('logout') }}">{{ app.user.email }}<br/>{{ 'Logout'|trans }}</a>
     {% else %}
         <a class="btn btn-outline-primary" href="{{ path('login') }}">{{ 'Login'|trans }}</a>
     {% endif %}

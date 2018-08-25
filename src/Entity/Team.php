@@ -40,9 +40,15 @@ class Team
      */
     private $owner;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Meeting", mappedBy="team")
+     */
+    private $meetings;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->meetings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -96,6 +102,37 @@ class Team
     public function setOwner(?User $owner): self
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Meeting[]
+     */
+    public function getMeetings(): Collection
+    {
+        return $this->meetings;
+    }
+
+    public function addMeeting(Meeting $meeting): self
+    {
+        if (!$this->meetings->contains($meeting)) {
+            $this->meetings[] = $meeting;
+            $meeting->setTeam($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMeeting(Meeting $meeting): self
+    {
+        if ($this->meetings->contains($meeting)) {
+            $this->meetings->removeElement($meeting);
+            // set the owning side to null (unless already changed)
+            if ($meeting->getTeam() === $this) {
+                $meeting->setTeam(null);
+            }
+        }
 
         return $this;
     }
