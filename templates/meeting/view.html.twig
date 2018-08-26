@@ -13,7 +13,17 @@
     </div>
 
     <div class="container">
-        <table class="table table-striped">
+        {% if meeting.isClosed == false and is_granted('MEETING_EDIT', meeting) %}
+            <a href="{{ path('meeting_close', {id:meeting.id}) }}" class="btn btn-warning">
+                {{ 'Close'|trans }}
+            </a>
+        {% endif %}
+        {% for message in app.flashes('notice') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+        <table class="table table-striped {% if meeting.isClosed %}table-dark{% endif %}">
             <thead>
             <tr>
                 <th scope="col">{{ 'User'|trans }}</th>
@@ -25,7 +35,12 @@
             <tbody>
             {% for attendee in meeting.attendees %}
                 <tr>
-                    <th scope="row"><a href="{{ path('meeting_attendee_edit', {hash: attendee.hash}) }}">{{ attendee.user.email }}</a></th>
+                    <th scope="row">
+                        {% if app.user.id == attendee.user.id %}
+                            ✅
+                        {% endif %}
+                        <a href="{{ path('meeting_attendee_edit', {hash: attendee.hash}) }}">{{ attendee.user.email }}</a>
+                    </th>
                     <td>{{ attendee.whatYesterday }}</td>
                     <td>{{ attendee.whatToday }}</td>
                     <td>{{ attendee.whatProblem }}</td>

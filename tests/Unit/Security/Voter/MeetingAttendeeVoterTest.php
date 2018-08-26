@@ -46,7 +46,7 @@ class MeetingAttendeeVoterTest extends TestCase
                 true,
             ],
             'unsupport subject' => [
-                'TEAM_EDIT',
+                'MEETING_ATTENDEE_EDIT',
                 new \stdClass(),
                 false,
             ],
@@ -56,6 +56,27 @@ class MeetingAttendeeVoterTest extends TestCase
                 false,
             ],
         ];
+    }
+
+    /**
+     * @test
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Non available case
+     */
+    public function throwWhenUndefinedAttribute()
+    {
+        $voter = new MeetingAttendeeVoter();
+        $method = $this->createVoterMethodVote($voter);
+
+        $token = $this->prophesize(TokenInterface::class);
+
+        $user = new User();
+        $token->getUser()->shouldBeCalled()->willReturn($user);
+        $subject = new Team();
+
+        $result = $method->invoke($voter, '', $subject, $token->reveal());
+
+        $this->assertFalse($result);
     }
 
     /**

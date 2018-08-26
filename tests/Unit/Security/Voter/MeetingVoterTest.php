@@ -2,27 +2,29 @@
 
 namespace App\Tests\Unit\Security\Voter;
 
+use App\Entity\Meeting;
 use App\Entity\Team;
 use App\Entity\User;
-use App\Security\Voter\TeamVoter;
+use App\Security\Voter\MeetingVoter;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
- * Class TeamVoterTest
+ * Class MeetingVoterTest
  * @package App\Tests\Unit\Security\Voter
  * @author Sergey Bevzenko <bevzenko.sergey@gmail.com>
  */
-class TeamVoterTest extends TestCase
+class MeetingVoterTest extends TestCase
 {
+
     /**
      * @test
      * @dataProvider examplesSupportAttributes
      */
     public function supportAttributes($attribute, $subject, bool $expect)
     {
-        $voter = new TeamVoter();
+        $voter = new MeetingVoter();
 
         $reflection = new ReflectionObject($voter);
         $method = $reflection->getMethod('supports');
@@ -39,23 +41,23 @@ class TeamVoterTest extends TestCase
     {
         return [
             'view attr support' => [
-                'TEAM_VIEW',
-                new Team(),
+                'MEETING_VIEW',
+                new Meeting(),
                 true,
             ],
             'edit attr support' => [
-                'TEAM_EDIT',
-                new Team(),
+                'MEETING_EDIT',
+                new Meeting(),
                 true,
             ],
             'unsupport subject' => [
-                'TEAM_EDIT',
+                'MEETING_VIEW',
                 new \stdClass(),
                 false,
             ],
             'unsupport attribute' => [
                 'TEAM_DELETE',
-                new Team(),
+                new Meeting(),
                 false,
             ],
         ];
@@ -68,7 +70,7 @@ class TeamVoterTest extends TestCase
      */
     public function throwWhenUndefinedAttribute()
     {
-        $voter = new TeamVoter();
+        $voter = new MeetingVoter();
         $method = $this->createVoterMethodVote($voter);
 
         $token = $this->prophesize(TokenInterface::class);
@@ -87,14 +89,14 @@ class TeamVoterTest extends TestCase
      */
     public function undefinedUserOnVoteOnAttribute()
     {
-        $voter = new TeamVoter();
+        $voter = new MeetingVoter();
         $method = $this->createVoterMethodVote($voter);
 
         $token = $this->prophesize(TokenInterface::class);
 
         $user = null;
         $token->getUser()->shouldBeCalled()->willReturn($user);
-        $subject = new Team();
+        $subject = new Meeting();
 
         $result = $method->invoke($voter, '', $subject, $token->reveal());
 
@@ -104,36 +106,21 @@ class TeamVoterTest extends TestCase
     /**
      * @test
      */
-    public function canViewOnVoteOnAttribute()
+    public function canNotEditOnVote()
     {
-        $voter = new TeamVoter();
+        $voter = new MeetingVoter();
         $method = $this->createVoterMethodVote($voter);
 
         $token = $this->prophesize(TokenInterface::class);
 
         $user = new User();
         $token->getUser()->shouldBeCalled()->willReturn($user);
-        $subject = (new Team())->setOwner($user);
 
-        $result = $method->invoke($voter, 'TEAM_VIEW', $subject, $token->reveal());
+        $owner = new User();
+        $team = (new Team())->setOwner($owner);
+        $subject = (new Meeting())->setTeam($team);
 
-        $this->assertTrue($result);
-    }
-
-    /**
-     * @test
-     */
-    public function canNotViewOnVoteOnAttribute()
-    {
-        $voter = new TeamVoter();
-        $method = $this->createVoterMethodVote($voter);
-
-        $token = $this->prophesize(TokenInterface::class);
-        $user = new User();
-        $token->getUser()->shouldBeCalled()->willReturn($user);
-        $subject = new Team();
-
-        $result = $method->invoke($voter, 'TEAM_VIEW', $subject, $token->reveal());
+        $result = $method->invoke($voter, 'MEETING_EDIT', $subject, $token->reveal());
 
         $this->assertFalse($result);
     }
@@ -141,18 +128,20 @@ class TeamVoterTest extends TestCase
     /**
      * @test
      */
-    public function canEditOnVoteOnAttribute()
+    public function canEditOnVote()
     {
-        $voter = new TeamVoter();
+        $voter = new MeetingVoter();
         $method = $this->createVoterMethodVote($voter);
 
         $token = $this->prophesize(TokenInterface::class);
 
         $user = new User();
         $token->getUser()->shouldBeCalled()->willReturn($user);
-        $subject = (new Team())->setOwner($user);
 
-        $result = $method->invoke($voter, 'TEAM_EDIT', $subject, $token->reveal());
+        $team = (new Team())->setOwner($user);
+        $subject = (new Meeting())->setTeam($team);
+
+        $result = $method->invoke($voter, 'MEETING_EDIT', $subject, $token->reveal());
 
         $this->assertTrue($result);
     }
@@ -160,21 +149,68 @@ class TeamVoterTest extends TestCase
     /**
      * @test
      */
-    public function canNotEditOnVoteOnAttribute()
+    public function canViewIfCanEdit()
     {
-        $voter = new TeamVoter();
+        $voter = new MeetingVoter();
         $method = $this->createVoterMethodVote($voter);
 
         $token = $this->prophesize(TokenInterface::class);
 
         $user = new User();
         $token->getUser()->shouldBeCalled()->willReturn($user);
-        $subject = new Team();
 
-        $result = $method->invoke($voter, 'TEAM_EDIT', $subject, $token->reveal());
+        $team = (new Team())->setOwner($user);
+        $subject = (new Meeting())->setTeam($team);
+
+        $result = $method->invoke($voter, 'MEETING_VIEW', $subject, $token->reveal());
+
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function canNotView()
+    {
+        $voter = new MeetingVoter();
+        $method = $this->createVoterMethodVote($voter);
+
+        $token = $this->prophesize(TokenInterface::class);
+
+        $currentUser = new User();
+        $token->getUser()->shouldBeCalled()->willReturn($currentUser);
+
+        $owner = new User();
+        $team = (new Team())->setOwner($owner)->addUser($owner);
+        $subject = (new Meeting())->setTeam($team);
+
+        $result = $method->invoke($voter, 'MEETING_VIEW', $subject, $token->reveal());
 
         $this->assertFalse($result);
     }
+
+    /**
+     * @test
+     */
+    public function canView()
+    {
+        $voter = new MeetingVoter();
+        $method = $this->createVoterMethodVote($voter);
+
+        $token = $this->prophesize(TokenInterface::class);
+
+        $currentUser = new User();
+        $token->getUser()->shouldBeCalled()->willReturn($currentUser);
+
+        $owner = new User();
+        $team = (new Team())->setOwner($owner)->addUser($owner)->addUser($currentUser);
+        $subject = (new Meeting())->setTeam($team);
+
+        $result = $method->invoke($voter, 'MEETING_VIEW', $subject, $token->reveal());
+
+        $this->assertTrue($result);
+    }
+
 
     /**
      * @param $voter

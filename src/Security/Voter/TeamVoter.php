@@ -63,7 +63,7 @@ class TeamVoter extends Voter
                 return $this->canEdit($subject, $user);
         }
 
-        throw new \LogicException('This code should not be reached!');
+        throw new \LogicException('Non available case');
     }
 
     /**

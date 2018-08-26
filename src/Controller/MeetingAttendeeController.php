@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Condition\MeetingEditableCondition;
 use App\Entity\MeetingAttendee;
 use App\Form\MeetingAttendeeType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,11 +24,15 @@ class MeetingAttendeeController extends AbstractController
      * @Route("/edit/{hash}", name="meeting_attendee_edit")
      * @Security("is_granted('MEETING_ATTENDEE_EDIT', attendee)")
      */
-    public function edit(Request $request, MeetingAttendee $attendee, EntityManagerInterface $em)
-    {
+    public function edit(
+        Request $request,
+        MeetingAttendee $attendee,
+        EntityManagerInterface $em,
+        MeetingEditableCondition $meetingEditableCondition
+    ) {
         $form = $this->createForm(MeetingAttendeeType::class, $attendee);
 
-        if ($request->isMethod('POST')) {
+        if ($meetingEditableCondition->availableEdit($attendee->getMeeting()) && $request->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $em->flush();
@@ -40,19 +45,26 @@ class MeetingAttendeeController extends AbstractController
             }
         }
 
-        return $this->render('meeting_attendee/edit.html.twig', [
-            'attendee' => $attendee,
-            'form' => $form->createView(),
-        ]);
+        return $this->render(
+            'meeting_attendee/edit.html.twig',
+            [
+                'attendee' => $attendee,
+                'form' => $form->createView(),
+            ]
+        );
     }
+
     /**
      * @Route("/view/{hash}", name="meeting_attendee_view")
      * @Security("is_granted('MEETING_ATTENDEE_VIEW', attendee)")
      */
     public function view(Request $request, MeetingAttendee $attendee, EntityManagerInterface $em)
     {
-        return $this->render('meeting_attendee/view.html.twig', [
-            'attendee' => $attendee,
-        ]);
+        return $this->render(
+            'meeting_attendee/view.html.twig',
+            [
+                'attendee' => $attendee,
+            ]
+        );
     }
 }

@@ -22,14 +22,16 @@ class MeetingRepository extends ServiceEntityRepository
 
     public function findForCurrentDate(Team $team, \DateTime $dateTime)
     {
-        return $this->createQueryBuilder('m')
+        $qb = $this->createQueryBuilder('m')
             ->andWhere('m.team = :team')
             ->andWhere('m.createdAt < :date')
             ->andWhere('m.createdAt > :prevDate')
             ->setParameter('team', $team)
             ->setParameter('date', $dateTime)
             ->setParameter('prevDate', new \DateTime($dateTime->format('Y-m-d 00:00:00')))
-            ->setMaxResults(1)
+            ->setMaxResults(1);
+
+        return $qb
             ->getQuery()
             ->getOneOrNullResult()
             ;

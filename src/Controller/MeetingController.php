@@ -60,7 +60,7 @@ class MeetingController extends AbstractController
         $meetingRepository = $em->getRepository(Meeting::class);
 
         if ($meeting = $meetingRepository->findForCurrentDate($team, $currentDate)) {
-            return $this->redirectToRoute('meeting_show', ['id' => $meeting->getId()]);
+            return $this->redirectToRoute('meeting_view', ['id' => $meeting->getId()]);
         }
 
         $data = [
@@ -96,16 +96,32 @@ class MeetingController extends AbstractController
     }
 
     /**
-     * @Route("/show/{id}", name="meeting_show")
-     * @Security("has_role('ROLE_USER')")
+     * @Route("/view/{id}", name="meeting_view")
+     * @Security("is_granted('MEETING_VIEW', meeting)")
      */
-    public function show(Request $request, Meeting $meeting)
+    public function view(Request $request, Meeting $meeting)
     {
         return $this->render(
-            'meeting/show.html.twig',
+            'meeting/view.html.twig',
             [
                 'meeting' => $meeting,
             ]
         );
+    }
+
+    /**
+     * @Route("/close/{id}", name="meeting_close")
+     * @Security("is_granted('MEETING_EDIT', meeting)")
+     */
+    public function meeting_close(Request $request, Meeting $meeting, EntityManagerInterface $em)
+    {
+        $meeting->setIsClosed(true);
+        $em->flush();
+        $this->addFlash(
+            'notice',
+            'Your changes were saved!'
+        );
+
+        return $this->redirectToRoute('meeting_view', ['id' => $meeting->getId()]);
     }
 }

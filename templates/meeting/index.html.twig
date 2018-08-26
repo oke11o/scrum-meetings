@@ -10,7 +10,7 @@
 
     <div class="container">
     {% for message in app.flashes('notice') %}
-        <div class="alert alert-notice">
+        <div class="alert alert-success">
             {{ message }}
         </div>
     {% endfor %}
@@ -40,7 +40,7 @@
                         {% for key, meeting in team.meetings %}
                             <tr>
                                 <th scope="row">{{ key+1 }}</th>
-                                <td><a href="{{ path('meeting_show', {id: meeting.id}) }}">{{ meeting.createdAt|date }}</a></td>
+                                <td><a href="{{ path('meeting_view', {id: meeting.id}) }}">{{ meeting.createdAt|date }}</a></td>
                                 <td>{{ meeting.attendees|length }}</td>
                             </tr>
                         {% endfor %}
@@ -72,7 +72,7 @@
                         {% for key, meeting in team.meetings %}
                             <tr>
                                 <th scope="row">{{ key+1 }}</th>
-                                <td><a href="{{ path('meeting_show', {id: meeting.id}) }}">{{ meeting.createdAt|date }}</a></td>
+                                <td><a href="{{ path('meeting_view', {id: meeting.id}) }}">{{ meeting.createdAt|date }}</a></td>
                                 <td>{{ meeting.attendees|length }}</td>
                             </tr>
                         {% endfor %}
